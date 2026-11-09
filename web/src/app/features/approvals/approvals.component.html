@@ -1,0 +1,157 @@
+<main class="page">
+  <header class="masthead">
+    <div>
+      <p class="org">Consware · Reembolsos de gastos</p>
+      <h1>Panel del aprobador</h1>
+    </div>
+    @if (filter() === 'Pending' && !loading() && !loadError()) {
+      <div class="summary">
+        <span class="summary-count">{{ items().length }}</span>
+        <span class="summary-text">
+          {{ items().length === 1 ? 'solicitud espera' : 'solicitudes esperan' }} decisión
+          @if (items().length > 0) {
+            <br />por {{ pendingTotal() | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}
+          }
+        </span>
+      </div>
+    }
+  </header>
+
+  <nav class="filters" aria-label="Filtrar por estado">
+    @for (f of filters; track f.value) {
+      <button
+        type="button"
+        class="filter"
+        [class.active]="filter() === f.value"
+        [attr.aria-pressed]="filter() === f.value"
+        (click)="setFilter(f.value)">
+        {{ f.label }}
+      </button>
+    }
+    <button type="button" class="refresh" (click)="load()" [disabled]="loading()">
+      {{ loading() ? 'Cargando…' : 'Actualizar' }}
+    </button>
+  </nav>
+
+  @if (notice(); as n) {
+    <div class="notice" [class.notice-error]="n.kind === 'error'" role="status">
+      <span>{{ n.text }}</span>
+      <button type="button" class="notice-close" (click)="notice.set(null)" aria-label="Cerrar">×</button>
+    </div>
+  }
+
+  <section class="sheet">
+    @if (loadError()) {
+      <div class="state">
+        <p class="state-title">No se pudieron cargar las solicitudes</p>
+        <p>{{ loadError() }}</p>
+        <button type="button" class="btn btn-primary" (click)="load()">Reintentar</button>
+      </div>
+    } @else if (loading() && items().length === 0) {
+      <div class="state"><p>Cargando solicitudes…</p></div>
+    } @else if (items().length === 0) {
+      <div class="state">
+        <p class="state-title">
+          {{ filter() === 'Pending' ? 'No hay solicitudes pendientes' : 'No hay solicitudes con este filtro' }}
+        </p>
+        <p>Las solicitudes de hasta $500.000 se aprueban automáticamente al crearse.</p>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Empleado</th>
+              <th scope="col">Categoría</th>
+              <th scope="col">Descripción</th>
+              <th scope="col" class="num">Monto</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Estado</th>
+              <th scope="col" class="actions-col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of items(); track r.id) {
+              <tr [class.busy]="busyId() === r.id">
+                <td class="mono">{{ r.id }}</td>
+                <td>{{ r.employeeName }}</td>
+                <td>{{ r.category }}</td>
+                <td class="desc" [title]="r.description">
+                  {{ r.description }}
+                  @if (r.rejectionReason) {
+                    <span class="reason">Motivo: {{ r.rejectionReason }}</span>
+                  }
+                </td>
+                <td class="num mono">{{ r.amount | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</td>
+                <td class="date">{{ r.createdAtUtc | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  <span class="badge" [class]="'badge badge-' + r.status.toLowerCase()">
+                    {{ statusLabels[r.status] }}
+                  </span>
+                </td>
+                <td class="actions-col">
+                  @if (r.status === 'Pending') {
+                    <div class="actions">
+                      <button type="button" class="btn btn-approve" [disabled]="busyId() !== null" (click)="approve(r)">
+                        Aprobar
+                      </button>
+                      <button type="button" class="btn btn-reject" [disabled]="busyId() !== null" (click)="openReject(r)">
+                        Rechazar
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="decided">
+                      {{ r.decidedAtUtc ? (r.decidedAtUtc | date: 'dd/MM/yyyy HH:mm') : '—' }}
+                    </span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</main>
+
+@if (rejecting(); as r) {
+  <div class="backdrop" (click)="closeReject()">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="reject-title" (click)="$event.stopPropagation()">
+      <h2 id="reject-title">Rechazar solicitud #{{ r.id }}</h2>
+      <p class="dialog-meta">
+        {{ r.employeeName }} · {{ r.category }} ·
+        <strong>{{ r.amount | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
+      </p>
+      <p class="dialog-desc">{{ r.description }}</p>
+
+      <label for="reason">Motivo del rechazo <span class="req">(obligatorio)</span></label>
+      <textarea
+        id="reason"
+        rows="4"
+        maxlength="500"
+        [ngModel]="reason()"
+        (ngModelChange)="reason.set($event)"
+        (blur)="reasonTouched.set(true)"
+        [class.invalid]="reasonTouched() && !reasonValid()"
+        placeholder="Explique por qué se rechaza el gasto"></textarea>
+      @if (reasonTouched() && !reasonValid()) {
+        <p class="field-error">Escriba un motivo; no puede estar vacío.</p>
+      }
+      @if (rejectError()) {
+        <p class="field-error">{{ rejectError() }}</p>
+      }
+
+      <div class="dialog-actions">
+        <button type="button" class="btn" (click)="closeReject()" [disabled]="busyId() !== null">Cancelar</button>
+        <button
+          type="button"
+          class="btn btn-reject-solid"
+          (click)="confirmReject()"
+          [disabled]="busyId() !== null || !reasonValid()">
+          {{ busyId() !== null ? 'Rechazando…' : 'Confirmar rechazo' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

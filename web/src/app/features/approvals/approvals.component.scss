@@ -1,0 +1,250 @@
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 20px;
+}
+
+.org {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.summary-count {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--pending);
+}
+
+.summary-text {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.filter {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+}
+
+.refresh {
+  margin-left: auto;
+  border: none;
+  background: none;
+  color: var(--brand);
+  cursor: pointer;
+  font-weight: 500;
+
+  &:disabled { color: var(--muted); cursor: default; }
+}
+
+.notice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  background: var(--approved-bg);
+  color: var(--approved);
+  border: 1px solid currentColor;
+
+  &.notice-error {
+    background: var(--rejected-bg);
+    color: var(--rejected);
+  }
+}
+
+.notice-close {
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.sheet {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+
+th {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: #f7f9fa;
+  white-space: nowrap;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+tr.busy { opacity: 0.5; }
+
+.num { text-align: right; white-space: nowrap; }
+
+.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 0.875rem; }
+
+.date, .decided { white-space: nowrap; color: var(--muted); font-size: 0.875rem; }
+
+.desc { max-width: 300px; }
+
+.reason {
+  display: block;
+  margin-top: 4px;
+  color: var(--rejected);
+  font-size: 0.8125rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge-pending { background: var(--pending-bg); color: var(--pending); }
+.badge-approved { background: var(--approved-bg); color: var(--approved); }
+.badge-rejected { background: var(--rejected-bg); color: var(--rejected); }
+
+.actions-col { white-space: nowrap; }
+
+.actions { display: flex; gap: 6px; }
+
+.btn {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn-approve { border-color: var(--approved); color: var(--approved); }
+.btn-approve:not(:disabled):hover { background: var(--approved-bg); }
+.btn-reject { border-color: var(--rejected); color: var(--rejected); }
+.btn-reject:not(:disabled):hover { background: var(--rejected-bg); }
+.btn-reject-solid { background: var(--rejected); border-color: var(--rejected); color: #fff; }
+
+.state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--muted);
+
+  p { margin: 0 0 8px; }
+}
+
+.state-title { color: var(--ink); font-weight: 600; font-size: 1.0625rem; }
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(29, 42, 51, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.dialog {
+  width: min(520px, 100%);
+  background: var(--paper);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+
+  h2 { margin: 0 0 6px; font-size: 1.25rem; font-weight: 600; }
+
+  label { display: block; font-weight: 500; margin-bottom: 6px; }
+
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    resize: vertical;
+
+    &:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+    &.invalid { border-color: var(--rejected); }
+  }
+}
+
+.dialog-meta { margin: 0; color: var(--muted); }
+.dialog-desc { margin: 8px 0 18px; }
+.req { color: var(--muted); font-weight: 400; }
+.field-error { color: var(--rejected); font-size: 0.875rem; margin: 6px 0 0; }
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .masthead { flex-direction: column; align-items: flex-start; }
+}
