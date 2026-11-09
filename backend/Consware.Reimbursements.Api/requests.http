@@ -1,0 +1,59 @@
+### Pruebas manuales (VS Code REST Client o Visual Studio / Rider)
+@base = http://localhost:5000/api/reimbursements
+
+### T01 - 100000 → Approved
+POST {{base}}
+Content-Type: application/json
+
+{ "employeeName": "Empleado Demo", "amount": 100000, "category": "Transporte", "description": "Taxi a reunión" }
+
+### T02 - 500000 exactos → Approved
+POST {{base}}
+Content-Type: application/json
+
+{ "employeeName": "Empleado Demo", "amount": 500000, "category": "Alimentación", "description": "Almuerzo con cliente" }
+
+### T03 - 500001 → Pending
+POST {{base}}
+Content-Type: application/json
+
+{ "employeeName": "Empleado Demo", "amount": 500001, "category": "Alimentación", "description": "Cena con cliente" }
+
+### T04 - monto 0 → 400
+POST {{base}}
+Content-Type: application/json
+
+{ "employeeName": "Empleado Demo", "amount": 0, "category": "Otros", "description": "x" }
+
+### T06 - descripción vacía → 400
+POST {{base}}
+Content-Type: application/json
+
+{ "employeeName": "Empleado Demo", "amount": 1000, "category": "Otros", "description": "   " }
+
+### T08 - id inexistente → 404
+GET {{base}}/999999
+
+### T09 - filtro por estado
+GET {{base}}?status=Pending
+
+### T11 - filtros combinados
+GET {{base}}?status=Pending&employeeName=Empleado%20Demo
+
+### Estado inválido → 400
+GET {{base}}?status=Foo
+
+### T12 - aprobar (cambie el id por uno Pending)
+PATCH {{base}}/3/approve
+
+### T14 - rechazar sin motivo → 400
+PATCH {{base}}/3/reject
+Content-Type: application/json
+
+{ "reason": "   " }
+
+### T13 - rechazar con motivo (id Pending)
+PATCH {{base}}/3/reject
+Content-Type: application/json
+
+{ "reason": "No cumple la política de gastos." }
