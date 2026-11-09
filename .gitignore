@@ -1,0 +1,23 @@
+# .NET
+**/bin/
+**/obj/
+*.user
+.vs/
+
+# Flutter
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.metadata
+
+# Angular
+web/node_modules/
+web/dist/
+web/.angular/
+
+# Editor y secretos
+.vscode/
+.idea/
+.env
+**/appsettings.Development.local.json
